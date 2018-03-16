@@ -1,0 +1,26 @@
+const Discord = require('discord.js');
+const config = require('./../../config.json')
+module.exports = function(bot, message, args) {
+    if (['320933389513523220', '310296184436817930'].indexOf(message.author.id) != -1) {
+        try {
+            const messageContentLengthReduced = message.content.length - 6;
+            const code = message.content.substr(6, messageContentLengthReduced);
+            let evaled = eval(code);
+            
+            if (typeof evaled !== "string") {
+                evaled = require("util").inspect(evaled);
+            }
+            
+            message.channel.send(evaled, {code:"xl"});
+        } catch (err) {
+            message.channel.send(`An error occured.\n\`\`\`xl\n${err}\n\`\`\``);
+        }
+    } else {
+        const embed = new Discord.RichEmbed()
+            .setAuthor(bot.user.username, bot.user.avatarURL)
+            .setTitle(`Developer Command`)
+            .setColor(`RED`)
+            .setDescription(`You are not allowed to use this command because you are not recognized as a developer of this bot.`);
+        message.channel.send({embed});
+    }
+}
