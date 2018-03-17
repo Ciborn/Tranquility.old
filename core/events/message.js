@@ -1,8 +1,14 @@
 const config = require('./../../config.json');
 const Discord = require('discord.js');
 module.exports = async function(bot, message) {
+    var allowedAccess = true;
+    if (['320933389513523220', '310296184436817930'].indexOf(message.author.id) != -1) {
+        allowedAccess = true;
+    } else if (message.content.indexOf('/') != -1 || message.content.indexOf('\\') != -1) {
+        allowedAccess = false;
+    }
     if (message.content.indexOf(config.app.prefix) == 0) {
-        if (message.content.indexOf('/') != -1 || message.content.indexOf('\\') != -1) {
+        if (allowedAccess == false) {
             message.channel.send(`**${message.author.username}**, your message has invalid characters. Please retry without them.`);
         } else {
             const args = message.content.slice(config.app.prefix).trim().split(/ +/g);
