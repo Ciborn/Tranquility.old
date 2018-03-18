@@ -2,7 +2,6 @@ const isEmpty = require('./../functions/utils/isEmpty');
 const showProfile = require('./../functions/activity/showProfile');
 const Discord = require('discord.js');
 module.exports = function(bot, message, args) {
-    const currentTime = process.hrtime()[1];
     const sendProfile = function(bot, userId, limit) {
         showProfile(bot, userId, limit).then(embed => {
             if (typeof embed != 'string') {
@@ -87,9 +86,5 @@ module.exports = function(bot, message, args) {
                 }
             }
         }
-    }
-
-    if (message.author.username == 'Ciborn') {
-        message.channel.send(`**Execution Time** : ${process.hrtime()[1] - currentTime} ns`);
     }
 }
