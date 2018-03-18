@@ -4,15 +4,20 @@ const Discord = require('discord.js');
 module.exports = function(bot, message, args) {
     const sendProfile = function(bot, userId, limit) {
         showProfile(bot, userId, limit).then(embed => {
-            embed = embed.setColor(bot.guilds.find('id', '379115766127001600').members.find('id', userId).highestRole.color);
-            message.channel.send(embed);
+            if (typeof embed != 'string') {
+                embed = embed.setColor(bot.guilds.find('id', '379115766127001600').members.find('id', userId).highestRole.color);
+                message.channel.send(embed);
+            } else {
+                embed = embed.replace('%u', message.author.username);
+                message.channel.send(embed);
+            }
         }).catch(err => {
             const embed = new Discord.RichEmbed()
                 .setAuthor(bot.user.username, bot.user.avatarURL)
                 .setTitle('An error occured.')
                 .setDescription(`Please report this error to <@320933389513523220>.\n\`\`\`${err}\`\`\``)
                 .setColor('RED');
-            message.channel.send({embed});
+            message.channel.send(embed);
         })
     }
 

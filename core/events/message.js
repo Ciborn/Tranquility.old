@@ -28,5 +28,5 @@ module.exports = async function(bot, message) {
         }
     }
 
-    require('./../functions/activity/updateMessageCount')(message);
+    //require('./../functions/activity/updateMessageCount')(message);
 }

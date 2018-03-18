@@ -5,9 +5,13 @@ module.exports = function(bot, message, args) {
     var limit = 10;
     if (!isEmpty(args)) {
         if (args[0] == '-a') {
-            limit = 999;
+            limit = 30;
         } else {
-            limit = args[0];
+            if (args[0] > 30) {
+                limit = 30;
+            } else {
+                limit = args[0];
+            }
         }
     }
     poolQuery(`SELECT * FROM activity`).then(result => {
@@ -60,7 +64,9 @@ module.exports = function(bot, message, args) {
             .setTitle(`${message.guild.name} Activity Leaderboard`)
             .setDescription(embedMembersList)
             .setColor('BLUE');
-        message.channel.send({embed});
+        message.channel.send({embed}).catch(err => {
+            message.channel.send(`The leaderboard you asked with your args seems to be too long to send, **${message.author.username}**, please retry with a lower limit.`)
+        })
     }).catch(err => {
 
     })
