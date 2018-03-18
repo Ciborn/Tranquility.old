@@ -14,8 +14,7 @@ module.exports = function(message) {
                     messagesTypes: {
                         chatting: msgCount.messagesTypes.chatting,
                         bots: msgCount.messagesTypes.bots
-                    },
-                    timestamps : msgCount.timestamps
+                    }
                 };
                 if (response != null) {
                     if (msgCountModel.messagesTypes.bots[response] == null) {
@@ -31,6 +30,13 @@ module.exports = function(message) {
                     msgCountModel.channels[message.channel.id] = 1;
                 } else {
                     msgCountModel.channels[message.channel.id]++;
+                }
+
+                // For old accounts
+                if (typeof msgCount.timestamps == 'undefined') {
+                    msgCountModel.timestamps = {};
+                } else {
+                    msgCountModel.timestamps = msgCount.timestamps;
                 }
 
                 if (msgCountModel.timestamps[generateDateHour(new Date())] == null) {

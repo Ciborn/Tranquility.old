@@ -7,7 +7,11 @@ module.exports = function(query) {
             } else {
                 connection.query(query, function(err, result) {
                     connection.release();
-                    resolve(result);
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(result);
+                    }
                 });
             }
         });
