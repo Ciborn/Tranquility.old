@@ -28,5 +28,7 @@ module.exports = async function(bot, message) {
         }
     }
 
-    require('./../functions/activity/updateMessageCount')(message);
+    if (message.guild.id == '379115766127001600') {
+        require('./../functions/activity/updateMessageCount')(message);
+    }
 }
