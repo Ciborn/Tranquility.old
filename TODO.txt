@@ -1,4 +1,0 @@
-Tranquility Bot
-
-[DEVELOPING] Saving count of messages for each member of Tranquility
-[PENDING]    Admin - Reset command

@@ -1,6 +1,10 @@
 const config = require('./../../config.json');
 const Discord = require('discord.js');
 module.exports = async function(bot, message) {
+    if (message.guild.id == '379115766127001600') {
+        require('./../functions/activity/updateMessageCount')(message);
+    }
+
     var allowedAccess = true;
     if (['320933389513523220', '310296184436817930'].indexOf(message.author.id) != -1) {
         allowedAccess = true;
@@ -26,9 +30,5 @@ module.exports = async function(bot, message) {
                 }
             }
         }
-    }
-
-    if (message.guild.id == '379115766127001600') {
-        require('./../functions/activity/updateMessageCount')(message);
     }
 }

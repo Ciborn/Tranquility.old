@@ -2,6 +2,7 @@ const isEmpty = require('./../functions/utils/isEmpty');
 const showProfile = require('./../functions/activity/showProfile');
 const Discord = require('discord.js');
 module.exports = function(bot, message, args) {
+    const currentTime = process.hrtime()[1];
     const sendProfile = function(bot, userId, limit) {
         showProfile(bot, userId, limit).then(embed => {
             if (typeof embed != 'string') {
@@ -24,70 +25,71 @@ module.exports = function(bot, message, args) {
     if (isEmpty(args)) {
         sendProfile(bot, message.author.id, 5);
     } else {
-        if (args.length == 1) {
-            if (args[0] == '-a') {
-                sendProfile(bot, message.author.id, 1000);
-            } else if (message.mentions.members.size == 1) {
-                sendProfile(bot, message.mentions.members.first().user.id, 5);
-            } else {
-                bot.fetchUser(args[0]).then(user => {
-                    sendProfile(bot, user.id, 5);
-                }).catch(err => {
-                    message.channel.send(`Sorry **${message.author.username}**, but the user ID you gave doesn't match with a valid user.`);
-                })
-            }
-        } else if (args.length == 2) {
+        var user = message.author.id;
+        var limit = 5;
+        var errorSaid = false;
+        if (args.length > 1) {
             if (args.indexOf('-l') != -1) {
-                if (typeof parseInt(args[args.indexOf('-l')+1]) == 'number') {
-                    sendProfile(bot, message.author.id, parseInt(args[args.indexOf('-l')+1]));
-                }
-            }
-        } else if (args.length == 3) {
-            var limit = 5;
-            if (args.indexOf('-a') != -1) {
-                limit = 1000;
-
-                if (args.indexOf('-u') != -1) {
-                    if (message.mentions.members.size == 1) {
-                        sendProfile(bot, message.mentions.members.first().user.id, limit);
-                    } else {
-                        bot.fetchUser(args[args.indexOf('-u')+1]).then(user => {
-                            sendProfile(bot, args[args.indexOf('-u')+1], limit);
-                        }).catch(err => {
-                            message.channel.send(`Sorry **${message.author.username}**, but **${args[args.indexOf('-u')+1]}** doesn't match with a valid user.`);
-                        })
-                    }
-                } else {
-                    message.channel.send(`It seems that there is a problem with your args, **${message.author.username}**. Please review them before retrying.`);
-                }
-            } else {
-                message.channel.send(`It seems that there is a problem with your args, **${message.author.username}**. Please review them before retrying.`);
-            }
-        } else if (args.length == 4) {
-            var limit = 5;
-            if (args.indexOf("-l") != -1) {
-                if (typeof parseInt(args.indexOf('-l')+1) == 'number') {
+                if (typeof args[args.indexOf('-l')+1] != 'undefined' && args[args.indexOf('-l')+1] != '-u' && args[args.indexOf('-l')+1].length < 3) {
                     limit = args[args.indexOf('-l')+1];
+                } else {
+                    if (errorSaid == false) {
+                        message.channel.send(`It seems that there is a problem with your args, **${message.author.username}**. Please review them before retrying.`);
+                        errorSaid = true;
+                    }
                 }
+            }
 
+            if (errorSaid == false) {
+                if (args.indexOf('-a') != -1) {
+                    limit = 1000;
+                }
                 if (args.indexOf('-u') != -1) {
-                    if (message.mentions.members.size == 1) {
-                        sendProfile(bot, message.mentions.members.first().user.id, limit);
+                    if (args[args.indexOf('-u')+1].length > 15) {
+                        if (message.mentions.members.size == 1) {
+                            sendProfile(bot, message.mentions.members.first().user.id, limit);
+                        } else {
+                            bot.fetchUser(args[args.indexOf('-u')+1]).then(user => {
+                                sendProfile(bot, args[args.indexOf('-u')+1], limit);
+                            }).catch(err => {
+                                message.channel.send(`Sorry **${message.author.username}**, but **${args[args.indexOf('-u')+1]}** doesn't match with a valid user.`);
+                            })
+                        }
                     } else {
-                        bot.fetchUser(args[args.indexOf('-u')+1]).then(user => {
-                            sendProfile(bot, args[args.indexOf('-u')+1], limit);
-                        }).catch(err => {
-                            message.channel.send(`Sorry **${message.author.username}**, but **${args[args.indexOf('-u')+1]}** doesn't match with a valid user.`);
-                        })
+                        if (errorSaid == false) {
+                            message.channel.send(`It seems that there is a problem with your args, **${message.author.username}**. Please review them before retrying.`);
+                            errorSaid = true;
+                        }
                     }
                 } else {
-                    message.channel.send(`It seems that there is a problem with your args, **${message.author.username}**. Please review them before retrying.`);
+                    sendProfile(bot, message.author.id, limit);
                 }
-            } else {
-                message.channel.send(`It seems that there is a problem with your args, **${message.author.username}**. Please review them before retrying.`);
             }
         } else {
-            message.channel.send(`It seems that there is a problem with your args, **${message.author.username}**. Please review them before retrying.`);
+            if (args[0] == '-a') {
+                sendProfile(bot, message.author.id, 1000);
+            } else {
+                if (args.indexOf('-l') != -1 || args.indexOf('-u') != -1) {
+                    if (errorSaid == false) {
+                        message.channel.send(`It seems that there is a problem with your args, **${message.author.username}**. Please review them before retrying.`);
+                        errorSaid = true;
+                    }
+                } else {
+                    if (message.mentions.members.size == 1) {
+                        sendProfile(bot, message.mentions.members.first().user.id, limit);
+                    } else {
+                        bot.fetchUser(args[args.indexOf('-u')+1]).then(user => {
+                            sendProfile(bot, args[args.indexOf('-u')+1], limit);
+                        }).catch(err => {
+                            message.channel.send(`Sorry **${message.author.username}**, but **${args[args.indexOf('-u')+1]}** doesn't match with a valid user.`);
+                        })
+                    }
+                }
+            }
         }
+    }
+
+    if (message.author.username == 'Ciborn') {
+        message.channel.send(`**Execution Time** : ${process.hrtime()[1] - currentTime} ns`);
     }
 }

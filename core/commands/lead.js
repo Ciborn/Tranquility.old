@@ -1,24 +1,76 @@
 const poolQuery = require('./../functions/database/poolQuery');
 const Discord = require('discord.js');
 const isEmpty = require('./../functions/utils/isEmpty');
+const objectValuesSum = require('./../functions/utils/objectValuesSum');
 module.exports = function(bot, message, args) {
     var limit = 10;
+    var leadType = 'total';
+    var leadTypeObject = 0;
+    var typeName = 'Total Messages';
     if (!isEmpty(args)) {
-        if (args[0] == '-a') {
+        if (args.indexOf('-a') != -1) {
             limit = 30;
-        } else {
-            if (args[0] > 30) {
+        } else if (args.indexOf('-l') != -1) {
+            if (args[args.indexOf('-l')+1] > 30) {
                 limit = 30;
             } else {
-                limit = args[0];
+                limit = args[args.indexOf('-l')+1];
+            }
+        }
+
+        if (args.indexOf('-t') != -1) {
+            if (typeof args[args.indexOf('-t')+2] == 'string') {
+                if (args[args.indexOf('-t')+1].indexOf('c') != -1) {
+                    leadType = 'c';
+                    if (message.mentions.channels.size == 1) {
+                        leadTypeObject = message.mentions.channels.first().id;
+                        typeName = `Messages in #${message.mentions.channels.first().name}`;
+                    }
+                } else if (args[args.indexOf('-t')+1].indexOf('b') != -1) {
+                    leadType = 'b';
+                    if (message.mentions.members.size == 1) {
+                        leadTypeObject = message.mentions.members.first().id;
+                        typeName = `Bot Usage of ${message.mentions.members.first().user.username}`;
+                    } else {
+                        bot.fetchUser(args[args.indexOf('-t')+2]).then(user => {
+                            leadTypeObject = user.id;
+                            typeName = `Bot Usage of ${user.username}`;
+                        });
+                    }
+                }
+            } else {
+                if (args[args.indexOf('-t')+1].indexOf('t') != -1) {
+                    leadType = 'total';
+                } else if (args[args.indexOf('-t')+1].indexOf('c') != -1) {
+                    leadType = 'chat';
+                    typeName = 'Total Chatting Messages';
+                } else if (args[args.indexOf('-t')+1].indexOf('b') != -1) {
+                    leadType = 'bots';
+                    typeName = 'Total Bots Usage Messages';
+                }
             }
         }
     }
+
     poolQuery(`SELECT * FROM activity`).then(result => {
         var allMembers = new Map();
         var embedMembersList = '';
         result.forEach(element => {
-            allMembers.set(element.userId, JSON.parse(element.msgCount).total);
+            if (leadType == 'total') {
+                allMembers.set(element.userId, JSON.parse(element.msgCount).total);
+            } else if (leadType == 'chat') {
+                allMembers.set(element.userId, JSON.parse(element.msgCount).messagesTypes.chatting);
+            } else if (leadType == 'bots') {
+                allMembers.set(element.userId, objectValuesSum(JSON.parse(element.msgCount).messagesTypes.bots));
+            } else if (leadType == 'c') {
+                if (JSON.parse(element.msgCount).channels[leadTypeObject] != undefined) {
+                    allMembers.set(element.userId, JSON.parse(element.msgCount).channels[leadTypeObject]);
+                }
+            } else if (leadType == 'b') {
+                if (JSON.parse(element.msgCount).messagesTypes.bots[leadTypeObject] != undefined) {
+                    allMembers.set(element.userId, JSON.parse(element.msgCount).messagesTypes.bots[leadTypeObject]);
+                }
+            }
         });
         
         allMembers[Symbol.iterator] = function* () {
@@ -61,7 +113,7 @@ module.exports = function(bot, message, args) {
 
         const embed = new Discord.RichEmbed()
             .setAuthor(bot.user.username, bot.user.avatarURL)
-            .setTitle(`${message.guild.name} Activity Leaderboard`)
+            .setTitle(`${message.guild.name} Activity Leaderboard | ${typeName}`)
             .setDescription(embedMembersList)
             .setColor('BLUE');
         message.channel.send({embed}).catch(err => {
