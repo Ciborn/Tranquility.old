@@ -1,6 +1,7 @@
 const poolQuery = require('./../database/poolQuery');
 const isEmpty = require('./../utils/isEmpty');
 const Discord = require('discord.js');
+const generateDateHour = require('./../utils/generateDateHour');
 module.exports = function(message) {
     const response = require('./checkMessageData')(message);
     if (message.author.bot != true) {
@@ -13,7 +14,8 @@ module.exports = function(message) {
                     messagesTypes: {
                         chatting: msgCount.messagesTypes.chatting,
                         bots: msgCount.messagesTypes.bots
-                    }
+                    },
+                    timestamps : msgCount.timestamps
                 };
                 if (response != null) {
                     if (msgCountModel.messagesTypes.bots[response] == null) {
@@ -30,6 +32,12 @@ module.exports = function(message) {
                 } else {
                     msgCountModel.channels[message.channel.id]++;
                 }
+
+                if (msgCountModel.timestamps[generateDateHour(new Date())] == null) {
+                    msgCountModel.timestamps[generateDateHour(new Date())] = 1;
+                } else {
+                    msgCountModel.timestamps[generateDateHour(new Date())]++;
+                }
                 poolQuery(`UPDATE activity SET msgCount='${JSON.stringify(msgCountModel)}', username='${message.author.username}', lastMsgId='${message.id}', lastMsgChannelId='${message.channel.id}', lastMsgTimestamp=${message.createdTimestamp} WHERE userId=${message.author.id}`);
             } else {
                 var msgCountModel = {
@@ -38,9 +46,11 @@ module.exports = function(message) {
                     messagesTypes: {
                         chatting: 0,
                         bots: {}
-                    }
+                    },
+                    timestamps: {}
                 };
                 msgCountModel.channels[message.channel.id] = 1;
+                msgCountModel.timestamps[generateDateHour(new Date())] = 1;
                 if (response != null) {
                     msgCountModel.messagesTypes.bots[response] = 1;
                 }
