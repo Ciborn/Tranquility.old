@@ -2,7 +2,7 @@ const config = require('./../../config.json');
 const Discord = require('discord.js');
 module.exports = async function(bot, message) {
     if (message.guild.id == '379115766127001600') {
-       require('./../functions/activity/updateMessageCount')(message);
+        require('./../functions/activity/updateMessageCount')(message);
     }
 
     var allowedAccess = true;

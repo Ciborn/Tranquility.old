@@ -3,7 +3,7 @@ const poolQuery = require('./../database/poolQuery');
 const convertDate = require('./../utils/convertDate');
 const userIndex = require('./returnPlaceInLead');
 const isEmpty = require('./../../functions/utils/isEmpty');
-module.exports = function(bot, userId, limit) {
+module.exports = function(bot, userId, limit, showTime) {
     const returnData = function(userId) {
         return new Promise((resolve, reject) => {
             poolQuery(`SELECT * FROM activity WHERE userId=${userId}`).then(result => {
@@ -20,16 +20,15 @@ module.exports = function(bot, userId, limit) {
                 bot.fetchUser(userId).then(user => {
                     const msgCount = JSON.parse(data.msgCount);
     
+                    // Channels
                     var channelsList = new Map();
                     var embedChannelsList = '';
                     Object.entries(msgCount.channels).forEach(element => {
                         channelsList.set(element[0], msgCount.channels[element[0]]);
                     })
-            
                     channelsList[Symbol.iterator] = function* () {
                         yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
                     }
-    
                     var channelsListLimit = 0;
                     for (let [key, value] of channelsList) {
                         if (channelsListLimit < limit) {
@@ -38,6 +37,7 @@ module.exports = function(bot, userId, limit) {
                         }
                     }
     
+                    // Bots Usage
                     var botsList = new Map();
                     var embedBotsList = '';
                     var botsMessagesCount = 0;
@@ -45,16 +45,36 @@ module.exports = function(bot, userId, limit) {
                         botsList.set(element[0], msgCount.messagesTypes.bots[element[0]]);
                         botsMessagesCount += msgCount.messagesTypes.bots[element[0]];
                     })
-            
                     botsList[Symbol.iterator] = function* () {
                         yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
                     }
-    
                     var botsListLimit = 0;
                     for (let [key, value] of botsList) {
                         if (botsListLimit < limit) {
                             botsListLimit++;
                             embedBotsList += `<@${bot.guilds.find('id', '379115766127001600').members.find('id', key).id}> : **${value}** messages\n`;
+                        }
+                    }
+
+                    // By Hour
+                    var embedTimeList = '';
+                    if (showTime == true) {
+                        var timeList = new Map();
+                        var timeMessagesCount = 0;
+                        Object.entries(msgCount.timestamps).forEach(element => {
+                            timeList.set(element[0], msgCount.timestamps[element[0]]);
+                            timeMessagesCount += msgCount.timestamps[element[0]];
+                        })
+                        timeList[Symbol.iterator] = function* () {
+                            yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
+                        }
+                        var timeListLimit = 0;
+                        for (let [key, value] of timeList) {
+                            if (timeListLimit < limit) {
+                                timeListLimit++;
+                                const splittedDate = key.split('-');
+                                embedTimeList += `\`\`${splittedDate[1]}/${splittedDate[2]}/${splittedDate[0]} ${splittedDate[3]}:00\`\` : **${value}** messages\n`;
+                            }
                         }
                     }
     
@@ -72,6 +92,10 @@ module.exports = function(bot, userId, limit) {
     
                         if (embedBotsList != '') {
                             embed.addField(`Most Used Bots`, embedBotsList, true);
+                        }
+
+                        if (embedTimeList != '') {
+                            embed.addField(`Most Active Hours (UTC)`, embedTimeList, true);
                         }
                     })
                 })
