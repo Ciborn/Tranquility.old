@@ -73,7 +73,7 @@ module.exports = function(bot, message, args) {
             if (args[0] == '-a') {
                 sendProfile(bot, message.author.id, 1000, false);
             } else if (args[0] == '-t') {
-                sendProfile(bot, message.author.id, 1000, true);
+                sendProfile(bot, message.author.id, limit, true);
             } else {
                 if (args.indexOf('-l') != -1 || args.indexOf('-u') != -1) {
                     if (errorSaid == false) {
