@@ -71,7 +71,7 @@ module.exports = function(bot, message, args) {
                         }
                     }
                 } else {
-                    sendProfile(bot, message.author.id, limit, showTime);
+                    sendProfile(bot, message.author.id, limit, showTime, phoneMode);
                 }
             }
         } else {
