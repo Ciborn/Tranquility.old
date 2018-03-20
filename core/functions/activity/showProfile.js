@@ -3,7 +3,7 @@ const poolQuery = require('./../database/poolQuery');
 const convertDate = require('./../utils/convertDate');
 const userIndex = require('./returnPlaceInLead');
 const isEmpty = require('./../../functions/utils/isEmpty');
-module.exports = function(bot, userId, limit, showTime) {
+module.exports = function(bot, userId, limit, showTime, phoneMode) {
     const returnData = function(userId) {
         return new Promise((resolve, reject) => {
             poolQuery(`SELECT * FROM activity WHERE userId=${userId}`).then(result => {
@@ -33,7 +33,11 @@ module.exports = function(bot, userId, limit, showTime) {
                     for (let [key, value] of channelsList) {
                         if (channelsListLimit < limit) {
                             channelsListLimit++;
-                            embedChannelsList += `<#${bot.guilds.find('id', '379115766127001600').channels.find('id', key).id}> : **${value}** messages\n`;
+                            if (phoneMode == true) {
+                                embedChannelsList += `**#${bot.guilds.find('id', '379115766127001600').channels.find('id', key).name}** : **${value}** messages\n`;
+                            } else {
+                                embedChannelsList += `<#${bot.guilds.find('id', '379115766127001600').channels.find('id', key).id}> : **${value}** messages\n`;
+                            }
                         }
                     }
     
@@ -52,7 +56,11 @@ module.exports = function(bot, userId, limit, showTime) {
                     for (let [key, value] of botsList) {
                         if (botsListLimit < limit) {
                             botsListLimit++;
-                            embedBotsList += `<@${bot.guilds.find('id', '379115766127001600').members.find('id', key).id}> : **${value}** messages\n`;
+                            if (phoneMode == true) {
+                                embedBotsList += `**${bot.guilds.find('id', '379115766127001600').members.find('id', key).user.username}** : **${value}** messages\n`;
+                            } else {
+                                embedBotsList += `<@${bot.guilds.find('id', '379115766127001600').members.find('id', key).id}> : **${value}** messages\n`;
+                            }
                         }
                     }
 

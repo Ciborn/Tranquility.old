@@ -2,11 +2,12 @@ const poolQuery = require('./../functions/database/poolQuery');
 const Discord = require('discord.js');
 const isEmpty = require('./../functions/utils/isEmpty');
 const objectValuesSum = require('./../functions/utils/objectValuesSum');
-module.exports = function(bot, message, args) {
+module.exports = async function(bot, message, args) {
     var limit = 10;
     var leadType = 'total';
     var leadTypeObject = 0;
     var typeName = 'Total Messages';
+    var phoneMode = false;
     if (!isEmpty(args)) {
         if (args.indexOf('-a') != -1) {
             limit = 30;
@@ -16,6 +17,10 @@ module.exports = function(bot, message, args) {
             } else {
                 limit = args[args.indexOf('-l')+1];
             }
+        }
+
+        if (args.indexOf('-p') != -1) {
+            phoneMode = true;
         }
 
         if (args.indexOf('-t') != -1) {
@@ -48,6 +53,27 @@ module.exports = function(bot, message, args) {
                     leadType = 'bots';
                     typeName = 'Total Bots Usage Messages';
                 }
+            }
+
+            if (message.mentions.channels.size > 0) {
+                leadType = 'c';
+                leadTypeObject = message.mentions.channels.first().id;
+                typeName = `Messages in #${message.mentions.channels.first().name}`;
+            } else if (message.mentions.members.size > 0) {
+                leadType = 'b';
+                leadTypeObject = message.mentions.members.first().id;
+                typeName = `Bot Usage of ${message.mentions.members.first().user.username}`;
+            } else if (args[args.indexOf('-t')+1].length > 15) {
+                leadType = 'b';
+                const user = await bot.fetchUser(args[args.indexOf('-t')+1]);
+                leadTypeObject = user.id;
+                typeName = `Bot Usage of ${user.username}`;
+            } else if (args[args.indexOf('-t')+1].indexOf('c') != -1) {
+                leadType = 'chat';
+                typeName = 'Total Chatting Messages';
+            } else if (args[args.indexOf('-t')+1].indexOf('b') != -1) {
+                leadType = 'bots';
+                typeName = 'Total Bots Usage Messages';
             }
         }
     }
@@ -99,7 +125,11 @@ module.exports = function(bot, message, args) {
                         badge = `\`\`${membersLimit+1}\`\`.`;
                     }
                     membersLimit++;
-                    embedMembersList += `**${badge}** <@${key}> : **${value}** messages\n`;
+                    if (phoneMode == true) {
+                        embedMembersList += `**${badge}** **${message.guild.members.find('id', key).user.username}** : **${value}** messages\n`;
+                    } else {
+                        embedMembersList += `**${badge}** <@${key}> : **${value}** messages\n`;
+                    }
                 }
             }
         } catch (err) {
@@ -111,14 +141,18 @@ module.exports = function(bot, message, args) {
             message.channel.send({embed});
         }
 
-        const embed = new Discord.RichEmbed()
-            .setAuthor(bot.user.username, bot.user.avatarURL)
-            .setTitle(`${message.guild.name} Activity Leaderboard | ${typeName}`)
-            .setDescription(embedMembersList)
-            .setColor('BLUE');
-        message.channel.send({embed}).catch(err => {
-            message.channel.send(`The leaderboard you asked with your args seems to be too long to send, **${message.author.username}**, please retry with a lower limit.`)
-        })
+        if (membersLimit == 0) {
+            message.channel.send(`Unfortunately **${message.author.username}**, there is nothing to show.`);
+        } else {
+            const embed = new Discord.RichEmbed()
+                .setAuthor(bot.user.username, bot.user.avatarURL)
+                .setTitle(`${message.guild.name} Activity Leaderboard | ${typeName}`)
+                .setDescription(embedMembersList)
+                .setColor('BLUE');
+            message.channel.send({embed}).catch(err => {
+                message.channel.send(`The leaderboard you asked with your args seems to be too long to send, **${message.author.username}**, please retry with a lower limit.`)
+            })
+        }
     }).catch(err => {
 
     })
