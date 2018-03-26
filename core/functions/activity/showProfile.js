@@ -57,9 +57,13 @@ module.exports = function(bot, userId, limit, showTime, phoneMode) {
                         if (botsListLimit < limit) {
                             botsListLimit++;
                             if (phoneMode == true) {
-                                embedBotsList += `**${bot.guilds.find('id', '379115766127001600').members.find('id', key).user.username}** : **${value}** messages\n`;
+                                if (typeof bot.guilds.find('id', '379115766127001600').members.find('id', key)) {
+                                    embedBotsList += `**${bot.guilds.find('id', '379115766127001600').members.find('id', key).user.username}** : **${value}** messages\n`;
+                                }
                             } else {
-                                embedBotsList += `<@${bot.guilds.find('id', '379115766127001600').members.find('id', key).id}> : **${value}** messages\n`;
+                                if (typeof bot.guilds.find('id', '379115766127001600').members.find('id', key)) {
+                                    embedBotsList += `<@${bot.guilds.find('id', '379115766127001600').members.find('id', key).id}> : **${value}** messages\n`;
+                                }
                             }
                         }
                     }
