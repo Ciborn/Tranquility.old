@@ -77,7 +77,6 @@ module.exports = function(message) {
                 var xpReward = 0;
                 if (new Date().getTime() - result[0].lastUpdateTimestamp <= 4000) {
                     xpReward = 0;
-                    goldRewards -= 3;
                 } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 6000) {
                     xpReward = 1;
                 } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 10000) {
