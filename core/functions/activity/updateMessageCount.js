@@ -3,7 +3,13 @@ const isEmpty = require('./../utils/isEmpty');
 const Discord = require('discord.js');
 const generateDateHour = require('./../utils/generateDateHour');
 module.exports = function(message) {
-    const response = require('./checkMessageData')(message);
+    const messageData = require('./checkMessageData')(message);
+    var response = null;
+    var goldRewards = 2;
+    if (messageData != null) {
+        response = messageData.id;
+        goldRewards = messageData.gold;
+    }
     if (message.author.bot != true) {
         poolQuery(`SELECT * FROM activity WHERE userId=${message.author.id}`).then(result => {
             if (!isEmpty(result)) {
@@ -63,5 +69,32 @@ module.exports = function(message) {
                 poolQuery(`INSERT INTO activity (userId, username, lastMsgId, lastMsgChannelId, lastMsgTimestamp, msgCount) VALUES ('${message.author.id}', '${message.author.username}', '${message.id}', '${message.channel.id}', ${message.createdTimestamp}, '${JSON.stringify(msgCountModel)}')`);
             }
         });
+
+        poolQuery(`SELECT * FROM profiles WHERE userId='${message.author.id}'`).then(result => {
+            if (isEmpty(result)) {
+                poolQuery(`INSERT INTO profiles (userId, xp, gold, items, settings, lastUpdateTimestamp) VALUES ('${message.author.id}', 25, ${goldRewards}, '${JSON.stringify({})}', '${JSON.stringify({})}', ${new Date().getTime()})`);
+            } else {
+                var xpReward = 0;
+                if (new Date().getTime() - result[0].lastUpdateTimestamp <= 4000) {
+                    xpReward = 0;
+                    goldRewards -= 3;
+                } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 6000) {
+                    xpReward = 1;
+                } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 10000) {
+                    xpReward = 2;
+                } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 15000) {
+                    xpReward = 4;
+                } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 20000) {
+                    xpReward = 6;
+                } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 30000) {
+                    xpReward = 10;
+                } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 45000) {
+                    xpReward = 17;
+                } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 60000) {
+                    xpReward = 26;
+                }
+                poolQuery(`UPDATE profiles SET xp=${result[0].xp+xpReward}, gold=${result[0].gold+goldRewards}, lastUpdateTimestamp=${new Date().getTime()} WHERE userId='${message.author.id}'`);
+            }
+        })
     }
 }
