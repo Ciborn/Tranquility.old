@@ -93,7 +93,7 @@ module.exports = function(bot, userId, limit, showTime, phoneMode) {
                     userIndex(user.id, index => {
                         var embed = new Discord.RichEmbed()
                             .setAuthor(`#${index} - ${user.username}`, user.avatarURL)
-                            .setTitle(`User Activity Profile`)
+                            .setTitle(`User Activity Statistics`)
                             .addField(`Total Message Count`, `**${msgCount.total}** messages`, true)
                             .addField(`Chatting Messages Count`, `**${msgCount.messagesTypes.chatting}** messages`, true)
                             .addField(`Bots Usage Messages Count`, `**${botsMessagesCount}** messages`, true)

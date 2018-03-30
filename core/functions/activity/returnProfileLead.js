@@ -4,9 +4,9 @@ module.exports = function(userId, callback) {
     var embedMembersList = '';
     var userIndex = 0;
     
-    poolQuery(`SELECT * FROM activity`).then(dbData => {
+    poolQuery(`SELECT * FROM profiles`).then(dbData => {
         dbData.forEach(element => {
-            allMembers.set(element.userId, JSON.parse(element.msgCount).total);
+            allMembers.set(element.userId, element.xp);
         });
         
         allMembers[Symbol.iterator] = function* () {
