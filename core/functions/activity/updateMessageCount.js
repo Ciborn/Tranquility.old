@@ -72,7 +72,7 @@ module.exports = function(message) {
 
         poolQuery(`SELECT * FROM profiles WHERE userId='${message.author.id}'`).then(result => {
             if (isEmpty(result)) {
-                poolQuery(`INSERT INTO profiles (userId, xp, gold, items, settings, lastUpdateTimestamp) VALUES ('${message.author.id}', 25, ${goldRewards}, '${JSON.stringify({})}', '${JSON.stringify({})}', ${new Date().getTime()})`);
+                poolQuery(`INSERT INTO profiles (userId, xp, gold, items, settings, lastUpdateTimestamp) VALUES ('${message.author.id}', 26, ${goldRewards}, '${JSON.stringify({})}', '${JSON.stringify({})}', ${new Date().getTime()})`);
             } else {
                 var xpReward = 0;
                 if (new Date().getTime() - result[0].lastUpdateTimestamp <= 4000) {

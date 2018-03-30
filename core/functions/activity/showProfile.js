@@ -1,8 +1,8 @@
 const Discord = require('discord.js');
 const poolQuery = require('./../database/poolQuery');
 const convertDate = require('./../utils/convertDate');
-const userIndex = require('./returnPlaceInLead');
 const isEmpty = require('./../../functions/utils/isEmpty');
+const userIndex = require('./returnPlaceInLead');
 module.exports = function(bot, userId, limit, showTime, phoneMode) {
     const returnData = function(userId) {
         return new Promise((resolve, reject) => {

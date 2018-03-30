@@ -7,6 +7,7 @@ module.exports = async function(bot, message, args) {
     var leadType = 'total';
     var leadTypeObject = 0;
     var typeName = 'Total Messages';
+    var unity = 'messages';
     var phoneMode = false;
     if (!isEmpty(args)) {
         if (args.indexOf('-a') != -1) {
@@ -68,36 +69,26 @@ module.exports = async function(bot, message, args) {
                 const user = await bot.fetchUser(args[args.indexOf('-t')+1]);
                 leadTypeObject = user.id;
                 typeName = `Bot Usage of ${user.username}`;
-            } else if (args[args.indexOf('-t')+1].indexOf('c') != -1) {
+            } else if (args[args.indexOf('-t')+1].indexOf('c') == 0) {
                 leadType = 'chat';
                 typeName = 'Total Chatting Messages';
-            } else if (args[args.indexOf('-t')+1].indexOf('b') != -1) {
+            } else if (args[args.indexOf('-t')+1].indexOf('b') == 0) {
                 leadType = 'bots';
                 typeName = 'Total Bots Usage Messages';
+            } else if (args[args.indexOf('-t')+1].indexOf('e') == 0) {
+                leadType = 'ether';
+                typeName = 'Ether';
+                unity = 'Ether';
+            } else if (args[args.indexOf('-t')+1].indexOf('x') == 0) {
+                leadType = 'xp';
+                typeName = 'Experience Points';
+                unity = 'XP';
             }
         }
     }
 
-    poolQuery(`SELECT * FROM activity`).then(result => {
-        var allMembers = new Map();
+    const sendLead = function(allMembers) {
         var embedMembersList = '';
-        result.forEach(element => {
-            if (leadType == 'total') {
-                allMembers.set(element.userId, JSON.parse(element.msgCount).total);
-            } else if (leadType == 'chat') {
-                allMembers.set(element.userId, JSON.parse(element.msgCount).messagesTypes.chatting);
-            } else if (leadType == 'bots') {
-                allMembers.set(element.userId, objectValuesSum(JSON.parse(element.msgCount).messagesTypes.bots));
-            } else if (leadType == 'c') {
-                if (JSON.parse(element.msgCount).channels[leadTypeObject] != undefined) {
-                    allMembers.set(element.userId, JSON.parse(element.msgCount).channels[leadTypeObject]);
-                }
-            } else if (leadType == 'b') {
-                if (JSON.parse(element.msgCount).messagesTypes.bots[leadTypeObject] != undefined) {
-                    allMembers.set(element.userId, JSON.parse(element.msgCount).messagesTypes.bots[leadTypeObject]);
-                }
-            }
-        });
         
         allMembers[Symbol.iterator] = function* () {
             yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
@@ -126,9 +117,9 @@ module.exports = async function(bot, message, args) {
                     }
                     membersLimit++;
                     if (phoneMode == true) {
-                        embedMembersList += `**${badge}** **${message.guild.members.find('id', key).user.username}** : **${value}** messages\n`;
+                        embedMembersList += `**${badge}** **${message.guild.members.find('id', key).user.username}** : **${value}** ${unity}\n`;
                     } else {
-                        embedMembersList += `**${badge}** <@${key}> : **${value}** messages\n`;
+                        embedMembersList += `**${badge}** <@${key}> : **${value}** ${unity}\n`;
                     }
                 }
             }
@@ -153,7 +144,44 @@ module.exports = async function(bot, message, args) {
                 message.channel.send(`The leaderboard you asked with your args seems to be too long to send, **${message.author.username}**, please retry with a lower limit.`)
             })
         }
-    }).catch(err => {
+    }
 
-    })
+    activityTableSupportedTypes = ['total', 'chat', 'bots', 'c', 'b'];
+    if (activityTableSupportedTypes.indexOf(leadType) != -1) {
+        poolQuery(`SELECT * FROM activity`).then(result => {
+            var allMembers = new Map();
+            result.forEach(element => {
+                if (leadType == 'total') {
+                    allMembers.set(element.userId, JSON.parse(element.msgCount).total);
+                } else if (leadType == 'chat') {
+                    allMembers.set(element.userId, JSON.parse(element.msgCount).messagesTypes.chatting);
+                } else if (leadType == 'bots') {
+                    allMembers.set(element.userId, objectValuesSum(JSON.parse(element.msgCount).messagesTypes.bots));
+                } else if (leadType == 'c') {
+                    if (JSON.parse(element.msgCount).channels[leadTypeObject] != undefined) {
+                        allMembers.set(element.userId, JSON.parse(element.msgCount).channels[leadTypeObject]);
+                    }
+                } else if (leadType == 'b') {
+                    if (JSON.parse(element.msgCount).messagesTypes.bots[leadTypeObject] != undefined) {
+                        allMembers.set(element.userId, JSON.parse(element.msgCount).messagesTypes.bots[leadTypeObject]);
+                    }
+                }
+            });
+            sendLead(allMembers);
+        });
+    } else {
+        poolQuery(`SELECT * FROM profiles`).then(result => {
+            var allMembers = new Map();
+            result.forEach(element => {
+                if (leadType == 'ether') {
+                    allMembers.set(element.userId, element.gold);
+                } else if (leadType == 'xp') {
+                    allMembers.set(element.userId, element.xp);
+                } else {
+                    allMembers.set(element.userId, element.xp);
+                }
+            });
+            sendLead(allMembers);
+        })
+    }
 }
