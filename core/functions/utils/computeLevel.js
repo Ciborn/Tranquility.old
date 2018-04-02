@@ -15,5 +15,5 @@ module.exports = function(totalXp) {
     } else {
         foundLevel = 0;
     }
-    return [foundLevel, rest];
+    return [foundLevel, Math.floor(50 + Math.pow((foundLevel+1) * 20, 1.55)) - Math.floor(50 + Math.pow(foundLevel * 20, 1.55)), rest];
 }

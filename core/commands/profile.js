@@ -42,7 +42,7 @@ module.exports = async function(bot, message, args) {
                     .addField('Ranking', `**\`\`[${rank}]\`\`** **#${index}** / ${total}`, true)
                     .addField('Ether', numeral(result[0].gold).format('0,0'), true)
                     .addField('Level', computeLevel(result[0].xp)[0], true)
-                    .addField('Experience', `${numeral(result[0].xp).format('0,0')} XP / ${numeral(Math.floor(50 + Math.pow((computeLevel(result[0].xp)[0]+1) * 20, 1.55))).format('0,0')} XP`, true)
+                    .addField('Experience', `${numeral(result[0].xp).format('0,0')} XP / ${numeral(Math.floor(50 + Math.pow((computeLevel(result[0].xp)[0]+1) * 20, 1.55))).format('0,0')} XP **(${Math.round(10 * (100 - (computeLevel(result[0].xp)[2] * 100 / computeLevel(result[0].xp)[1]) ))/10}%)**`, true)
                     .setColor(bot.guilds.find('id', '379115766127001600').members.find('id', user).displayColor)
                     .setFooter(`View detailled statistics about your activity by checking ${config.app.prefix}stats!`);
                 message.channel.send({embed});
