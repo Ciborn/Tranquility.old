@@ -42,7 +42,6 @@ module.exports = function(bot, userId, limit, showTime, phoneMode) {
                                 }
                             } else {
                                 if (bot.guilds.find('id', '379115766127001600').channels.find('id', key) != null) {
-                                    bot.guilds.find('name', 'Tranquility').channels.find('name', 'bot_and_chat').send(key);
                                     embedChannelsList += `**<#${bot.guilds.find('id', '379115766127001600').channels.find('id', key).id}>** : **${value}** messages\n`;
                                 } else {
                                     delete msgCount.channels[key];
