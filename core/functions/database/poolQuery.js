@@ -1,7 +1,7 @@
 const pool = require('./returnPool.js');
 module.exports = function(query) {
     return new Promise((resolve, reject) => {
-        pool.getConnection(function(err, connection) {
+        pool.getConnection((err, connection) => {
             if (err) {
                 reject(err);
             } else {

@@ -1,7 +1,7 @@
 module.exports = function(totalXp) {
     var foundLevel = 0;
     var rest = 0;
-    var computingLevel = 1000;
+    var computingLevel = 10000;
     var computingXp = Math.floor(totalXp);
     if (totalXp > 153) {
         do {

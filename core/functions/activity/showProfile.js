@@ -34,9 +34,20 @@ module.exports = function(bot, userId, limit, showTime, phoneMode) {
                         if (channelsListLimit < limit) {
                             channelsListLimit++;
                             if (phoneMode == true) {
-                                embedChannelsList += `**#${bot.guilds.find('id', '379115766127001600').channels.find('id', key).name}** : **${value}** messages\n`;
+                                if (bot.guilds.find('id', '379115766127001600').channels.find('id', key) != null) {
+                                    embedChannelsList += `**#${bot.guilds.find('id', '379115766127001600').channels.find('id', key).name}** : **${value}** messages\n`;
+                                } else {
+                                    delete msgCount.channels[key];
+                                    poolQuery(`UPDATE activity SET msgCount='${JSON.stringify(msgCount)}' WHERE userId='${userId}'`);
+                                }
                             } else {
-                                embedChannelsList += `<#${bot.guilds.find('id', '379115766127001600').channels.find('id', key).id}> : **${value}** messages\n`;
+                                if (bot.guilds.find('id', '379115766127001600').channels.find('id', key) != null) {
+                                    bot.guilds.find('name', 'Tranquility').channels.find('name', 'bot_and_chat').send(key);
+                                    embedChannelsList += `**<#${bot.guilds.find('id', '379115766127001600').channels.find('id', key).id}>** : **${value}** messages\n`;
+                                } else {
+                                    delete msgCount.channels[key];
+                                    poolQuery(`UPDATE activity SET msgCount='${JSON.stringify(msgCount)}' WHERE userId='${userId}'`);
+                                }
                             }
                         }
                     }
@@ -57,12 +68,18 @@ module.exports = function(bot, userId, limit, showTime, phoneMode) {
                         if (botsListLimit < limit) {
                             botsListLimit++;
                             if (phoneMode == true) {
-                                if (typeof bot.guilds.find('id', '379115766127001600').members.find('id', key)) {
+                                if (bot.guilds.find('id', '379115766127001600').members.find('id', key) != null) {
                                     embedBotsList += `**${bot.guilds.find('id', '379115766127001600').members.find('id', key).user.username}** : **${value}** messages\n`;
+                                } else {
+                                    delete msgCount.messagesTypes.bots[key];
+                                    poolQuery(`UPDATE activity SET msgCount='${JSON.stringify(msgCount)}' WHERE userId='${userId}'`);
                                 }
                             } else {
-                                if (typeof bot.guilds.find('id', '379115766127001600').members.find('id', key)) {
+                                if (bot.guilds.find('id', '379115766127001600').members.find('id', key) != null) {
                                     embedBotsList += `<@${bot.guilds.find('id', '379115766127001600').members.find('id', key).id}> : **${value}** messages\n`;
+                                } else {
+                                    delete msgCount.messagesTypes.bots[key];
+                                    poolQuery(`UPDATE activity SET msgCount='${JSON.stringify(msgCount)}' WHERE userId='${userId}'`);
                                 }
                             }
                         }
