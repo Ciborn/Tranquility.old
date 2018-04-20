@@ -1,0 +1,27 @@
+const isEmpty = require('./../functions/utils/isEmpty');
+const poolQuery = require('./../functions/database/poolQuery');
+module.exports = async function(bot, message, args) {
+    if (!isEmpty(args)) {
+        poolQuery(`SELECT * FROM codes WHERE keygen='${args[0]}'`).then(async function(data) {
+            if (data[0].type == 'boost') {
+                const profile = await poolQuery(`SELECT * FROM profiles WHERE userId='${message.author.id}'`);
+                var boosts = JSON.parse(profile[0].boosts);
+                var boostData = JSON.parse(data[0].data);
+                boosts[`${boostData.type}_${boostData.boost}`] = boosts[`${boostData.type}_${boostData.boost}`] == undefined ? boostData.duration : boosts[`${boostData.type}_${boostData.boost}`] + boostData.duration;
+                try {
+                    await poolQuery(`UPDATE profiles SET boosts='${JSON.stringify(boosts)}' WHERE userId='${message.author.id}'`);
+                    await poolQuery(`DELETE FROM codes WHERE keygen='${data[0].keygen}'`);
+                    message.channel.send(`Your key has been successfully redeemed, **${message.author.username}**.`);
+                } catch(err) {
+                    message.channel.send(`Sorry **${message.author.username}**, but an error occured while updating your status.`);
+                }
+            } else {
+                message.channel.send(`This type of key is not supported yet.`);
+            }
+        }).catch(err => {
+            message.channel.send(`Sorry **${message.author.username}**, but your key has not been found. Make sure it is correct.`);
+        })
+    } else {
+        message.channel.send(`There is a problem with your args, **${message.author.username}**.`);
+    }
+}
