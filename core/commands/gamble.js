@@ -2,7 +2,9 @@ const poolQuery = require('./../functions/database/poolQuery');
 const isEmpty = require('./../functions/utils/isEmpty');
 const Discord = require('discord.js');
 module.exports = function(bot, message, args) {
-    if (!isEmpty(args)) {
+    message.channel.send(`This command has been disabled due to unknown bugs with the database.`);
+
+    /*if (!isEmpty(args)) {
         const sendError = function(err) {
             const embed = new Discord.RichEmbed()
                 .setTitle(`An error occured`)
@@ -51,5 +53,5 @@ module.exports = function(bot, message, args) {
             .setDescription('You need to tell me how much you want to gamble.')
             .setColor('ORANGE');
         message.channel.send({embed});
-    }
+    }*/
 }

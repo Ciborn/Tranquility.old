@@ -1,11 +1,11 @@
 const poolQuery = require('./../database/poolQuery');
 const isEmpty = require('./../utils/isEmpty');
 const Discord = require('discord.js');
-const generateDateHour = require('./../utils/generateDateHour');
+const generateDateHour = require('./../time/generateDateHour');
 module.exports = function(message) {
     const messageData = require('./checkMessageData')(message);
     var response = null;
-    var goldRewards = 2;
+    var goldRewards = 20;
     if (messageData != null) {
         response = messageData.id;
         goldRewards = messageData.gold;

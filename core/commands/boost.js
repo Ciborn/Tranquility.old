@@ -2,8 +2,10 @@ const Discord = require('discord.js');
 const isAdmin = require('./../functions/admin/isAdmin');
 const isEmpty = require('./../functions/utils/isEmpty');
 const poolQuery = require('./../functions/database/poolQuery');
-const convertDate = require('./../functions/utils/convertDate');
-const convertDuration = require('./../functions/utils/convertDuration');
+const convertDate = require('./../functions/time/convertDate');
+const convertDuration = require('./../functions/time/convertDuration');
+const mostImportantDuration = require('./../functions/time/mostImportantDuration');
+const getStringDuration = require('./../functions/time/getStringDuration');
 module.exports = async function(bot, message, args) {
     if (!isEmpty(args)) {
         if (args[0].indexOf('buy') != -1) {
@@ -32,7 +34,7 @@ module.exports = async function(bot, message, args) {
                     });
                 }
             } else {
-                message.channel.send(`You are not part of the development team of Tranquility, **${message.author.id}**.`);
+                message.channel.send(`You are not part of the development team of Tranquility, **${message.author.username}**.`);
             }
         } else {
             message.channel.send(`There is a problem with your args, **${message.author.username}**.`);
@@ -46,11 +48,26 @@ module.exports = async function(bot, message, args) {
         if (isEmpty(gotBoosts)) {
             currentBoosts = `You do not have any boost, currently.`;
         } else {
+            const returnRemainingTime = function(duration) {
+                const remainingTime = getStringDuration(duration, '$d $h $m $s');
+                var string = '';
+                if (remainingTime[1][0] != 0) {
+                    string += `$dd$hh$mm$ss`;
+                } else if (remainingTime[1][1] != 0) {
+                    string += `$hh$mm$ss`;
+                } else if (remainingTime[1][2] != 0) {
+                    string += `$mm$ss`;
+                } else {
+                    string += `$ss`;
+                }
+                return getStringDuration(duration, string.trim())[0];
+            }
+
             for (let [key, value] of Object.entries(gotBoosts)) {
                 if (key.indexOf('xp') == 0) {
-                    currentBoosts += `**${key.split('_')[1]}%** - \`${convertDate(new Date(value), '$p/$d/$y $h:$m')} UTC\` - **XP Boost**\n`;
+                    currentBoosts += `**${key.split('_')[1]}%** - \`${returnRemainingTime(new Date(value).getTime() - new Date().getTime())}\` remaining - **XP Boost**\n`;
                 } else if (key.indexOf('gold') == 0) {
-                    currentBoosts += `**${key.split('_')[1]}%** - \`${convertDate(new Date(value), '$p/$d/$y $h:$m')} UTC\` - **Gold Boost**\n`;
+                    currentBoosts += `**${key.split('_')[1]}%** - \`${returnRemainingTime(new Date(value).getTime() - new Date().getTime())}\` remaining - **Gold Boost**\n`;
                 }
             }
         }
