@@ -14,7 +14,7 @@ module.exports = function(bot, message, args) {
             
             message.channel.send(`Execution Time : ${Math.floor((process.hrtime()[1] - exactTime)/1000)} µs\n\`\`\`xl\n${evaled}\`\`\``);
         } catch (err) {
-            message.channel.send(`An error occured.\n\`\`\`xl\n${err}\n\`\`\``);
+            message.channel.send(`An error occured.\n\`\`\`xl\n${require('util').inspect(err, false, null)}\n\`\`\``);
         }
     } else {
         const embed = new Discord.RichEmbed()

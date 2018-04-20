@@ -72,9 +72,10 @@ module.exports = function(message) {
 
         poolQuery(`SELECT * FROM profiles WHERE userId='${message.author.id}'`).then(result => {
             if (isEmpty(result)) {
-                poolQuery(`INSERT INTO profiles (userId, xp, gold, items, settings, lastUpdateTimestamp) VALUES ('${message.author.id}', 26, ${goldRewards}, '${JSON.stringify({})}', '${JSON.stringify({})}', ${new Date().getTime()})`);
+                poolQuery(`INSERT INTO profiles (userId, xp, gold, boosts, settings, lastUpdateTimestamp) VALUES ('${message.author.id}', 26, ${goldRewards}, '${JSON.stringify({})}', '${JSON.stringify({})}', ${new Date().getTime()})`);
             } else {
                 var xpReward = 0;
+                const boosts = JSON.parse(result[0].boosts);
                 if (new Date().getTime() - result[0].lastUpdateTimestamp <= 4000) {
                     xpReward = 0;
                 } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 6000) {
@@ -92,7 +93,22 @@ module.exports = function(message) {
                 } else if (new Date().getTime() - result[0].lastUpdateTimestamp <= 60000) {
                     xpReward = 26;
                 }
-                poolQuery(`UPDATE profiles SET xp=${result[0].xp+xpReward}, gold=${result[0].gold+goldRewards}, lastUpdateTimestamp=${new Date().getTime()} WHERE userId='${message.author.id}'`);
+
+                if (!isEmpty(boosts)) {
+                    for (let [key, value] of Object.entries(boosts)) {
+                        if (key.indexOf('xp') == 0) {
+                            xpReward = xpReward * key.split('_')[1] / 100;
+                        } else if (key.indexOf('gold') == 0) {
+                            goldRewards = goldRewards * key.split('_')[1] / 100;
+                        }
+
+                        if (value < new Date().getTime()) {
+                            delete boosts[key];
+                        }
+                    }
+                }
+
+                poolQuery(`UPDATE profiles SET xp=${result[0].xp+xpReward}, gold=${result[0].gold+goldRewards}, boosts='${JSON.stringify(boosts)}', lastUpdateTimestamp=${new Date().getTime()} WHERE userId='${message.author.id}'`);
             }
         })
     }

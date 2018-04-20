@@ -16,6 +16,10 @@ module.exports = function(date, string) {
         string = string.replace('$o', months[date.getMonth()])
     }
 
+    if (string.indexOf('$p') != -1) {
+        string = string.replace('$p', date.getMonth());
+    }
+
     if (string.indexOf('$y') != -1) {
         string = string.replace('$y', date.getFullYear())
     }
