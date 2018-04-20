@@ -65,9 +65,9 @@ module.exports = async function(bot, message, args) {
 
             for (let [key, value] of Object.entries(gotBoosts)) {
                 if (key.indexOf('xp') == 0) {
-                    currentBoosts += `**${key.split('_')[1]}%** - \`${returnRemainingTime(new Date(value).getTime() - new Date().getTime())}\` remaining - **XP Boost**\n`;
+                    currentBoosts += `**+${key.split('_')[1]-100}%** - \`${returnRemainingTime(new Date(value).getTime() - new Date().getTime())}\` remaining - **XP Boost**\n`;
                 } else if (key.indexOf('gold') == 0) {
-                    currentBoosts += `**${key.split('_')[1]}%** - \`${returnRemainingTime(new Date(value).getTime() - new Date().getTime())}\` remaining - **Gold Boost**\n`;
+                    currentBoosts += `**+${key.split('_')[1]-100}%** - \`${returnRemainingTime(new Date(value).getTime() - new Date().getTime())}\` remaining - **Gold Boost**\n`;
                 }
             }
         }
