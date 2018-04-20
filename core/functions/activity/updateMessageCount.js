@@ -94,12 +94,14 @@ module.exports = function(message) {
                     xpReward = 26;
                 }
 
+                var xpBoost = 100;
+                var goldBoost = 100;
                 if (!isEmpty(boosts)) {
                     for (let [key, value] of Object.entries(boosts)) {
                         if (key.indexOf('xp') == 0) {
-                            xpReward = xpReward * key.split('_')[1] / 100;
+                            xpBoost += key.split('_')[1] - 100;
                         } else if (key.indexOf('gold') == 0) {
-                            goldRewards = goldRewards * key.split('_')[1] / 100;
+                            goldBoost += key.split('_')[1] - 100;
                         }
 
                         if (value < new Date().getTime()) {
@@ -108,7 +110,10 @@ module.exports = function(message) {
                     }
                 }
 
-                poolQuery(`UPDATE profiles SET xp=${result[0].xp+xpReward}, gold=${result[0].gold+goldRewards}, boosts='${JSON.stringify(boosts)}', lastUpdateTimestamp=${new Date().getTime()} WHERE userId='${message.author.id}'`);
+                var finalXPReward = Math.round(result[0].xp + xpReward * xpBoost / 100);
+                var finalGoldReward = Math.round(result[0].gold + goldRewards * goldBoost / 100);
+
+                poolQuery(`UPDATE profiles SET xp=${finalXPReward}, gold=${finalGoldReward}, boosts='${JSON.stringify(boosts)}', lastUpdateTimestamp=${new Date().getTime()} WHERE userId='${message.author.id}'`);
             }
         })
     }
