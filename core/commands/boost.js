@@ -21,7 +21,7 @@ module.exports = async function(bot, message, args) {
                 if (supportedBoosts.indexOf(args[2]) != -1) {
                     const result = await poolQuery(`SELECT * FROM profiles WHERE userId='${args[1]}'`);
                     var gotBoosts = JSON.parse(result[0].boosts);
-                    gotBoosts[`${args[2]}_${args[3]}`] != undefined ? gotBoosts[`${args[2]}_${args[3]}`] += parseInt(convertDuration(args[4])) : gotBoosts[`${args[2]}_${args[3]}`] = new Date().getTime() + parseInt(convertDuration(args[4]));
+                    gotBoosts[`${args[2]}_${args[3]}`] = gotBoosts[`${args[2]}_${args[3]}`] != undefined ? gotBoosts[`${args[2]}_${args[3]}`] + parseInt(convertDuration(args[4])) : new Date().getTime() + parseInt(convertDuration(args[4]));
                     poolQuery(`UPDATE profiles SET boosts='${JSON.stringify(gotBoosts)}' WHERE userId='${args[1]}'`).then(succeed => {
                         const embed = new Discord.RichEmbed()
                             .setTitle('Boost Successfully Given')

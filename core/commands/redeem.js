@@ -1,5 +1,6 @@
 const isEmpty = require('./../functions/utils/isEmpty');
 const poolQuery = require('./../functions/database/poolQuery');
+const convertDuration = require('./../functions/time/convertDuration');
 module.exports = async function(bot, message, args) {
     if (!isEmpty(args)) {
         poolQuery(`SELECT * FROM codes WHERE keygen='${args[0]}'`).then(async function(data) {
@@ -7,14 +8,19 @@ module.exports = async function(bot, message, args) {
                 const profile = await poolQuery(`SELECT * FROM profiles WHERE userId='${message.author.id}'`);
                 var boosts = JSON.parse(profile[0].boosts);
                 var boostData = JSON.parse(data[0].data);
-                boosts[`${boostData.type}_${boostData.boost}`] = boosts[`${boostData.type}_${boostData.boost}`] == undefined ? boostData.duration : boosts[`${boostData.type}_${boostData.boost}`] + boostData.duration;
+                var duration = convertDuration(boostData.duration);
+                boosts[`${boostData.type}_${boostData.boost}`] = boosts[`${boostData.type}_${boostData.boost}`] == undefined ? new Date().getTime() + duration : boosts[`${boostData.type}_${boostData.boost}`] + duration;
                 try {
-                    await poolQuery(`UPDATE profiles SET boosts='${JSON.stringify(boosts)}' WHERE userId='${message.author.id}'`);
                     await poolQuery(`DELETE FROM codes WHERE keygen='${data[0].keygen}'`);
                     message.channel.send(`Your key has been successfully redeemed, **${message.author.username}**.`);
                 } catch(err) {
                     message.channel.send(`Sorry **${message.author.username}**, but an error occured while updating your status.`);
                 }
+
+                
+                await poolQuery(`UPDATE profiles SET boosts='${JSON.stringify(boosts)}' WHERE userId='${message.author.id}'`).catch(err => {
+                    console.log(err);
+                })
             } else {
                 message.channel.send(`This type of key is not supported yet.`);
             }
