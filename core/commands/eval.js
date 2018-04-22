@@ -1,6 +1,6 @@
 const Discord = require('discord.js');
 const config = require('./../../config.json')
-module.exports = function(bot, message, args) {
+module.exports = async function(bot, message, args) {
     const exactTime = process.hrtime()[1];
     if (['320933389513523220', '310296184436817930'].indexOf(message.author.id) != -1) {
         try {
