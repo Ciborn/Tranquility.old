@@ -4,8 +4,8 @@ module.exports = class User {
         this.id = user.id;
         this.discordUser = user;
         
-        this.fetchStats(this.id);
-        this.fetchProfile(this.id);
+        this.fetchStats(this.id).then();
+        this.fetchProfile(this.id).then();
 
         this.admin = User.isAdmin(this.id);
     }
@@ -19,6 +19,7 @@ module.exports = class User {
         var result = await poolQuery(`SELECT * FROM profiles WHERE userId='${id}'`);
         console.log(result[0]);
         this.profile = result[0];
+        console.log(this.profile);
     }
 
     static isAdmin(id) {

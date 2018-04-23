@@ -17,11 +17,11 @@ module.exports = async function(bot, message, args) {
             message.channel.send(`An error occured.\n\`\`\`xl\n${require('util').inspect(err, false, null)}\n\`\`\``);
         }
     } else {
-        const embed = new Discord.RichEmbed()
+        const embed = new Discord.RichtEmbed()
             .setAuthor(bot.user.username, bot.user.avatarURL)
             .setTitle(`Developer Command`)
             .setColor(`RED`)
-            .setDescription(`You are not allowed to use this command because you are not recognized as a developer of this bot.`);
+            .setDescription(`You are no allowed to use this command because you are not recognized as a developer of this bot.`);
         message.channel.send({embed});
     }
 }
