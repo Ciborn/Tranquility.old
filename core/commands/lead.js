@@ -90,14 +90,25 @@ module.exports = async function(bot, message, args) {
     const sendLead = function(allMembers) {
         var embedMembersList = '';
         
-        allMembers[Symbol.iterator] = function* () {
-            yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
+        if (args.indexOf('-r') != -1) {
+            allMembers[Symbol.iterator] = function* () {
+                yield* [...this.entries()].sort((a, b) => a[1] - b[1]);
+            }
+        } else {
+            allMembers[Symbol.iterator] = function* () {
+                yield* [...this.entries()].sort((a, b) => b[1] - a[1]);
+            }
         }
 
         var membersLimit = 0;
+        var shownMembers = 0;
+        if (args.indexOf('-r') != -1) {
+            membersLimit = allMembers.size;
+        }
+
         try {
             for (let [key, value] of allMembers) {
-                if (membersLimit < limit) {
+                if (shownMembers < limit) {
                     let badge = '';
                     if (membersLimit == 0) {
                         embedMembersList += `**Top 3**\n`;
@@ -115,7 +126,8 @@ module.exports = async function(bot, message, args) {
                     } else {
                         badge = `\`\`${membersLimit+1}\`\`.`;
                     }
-                    membersLimit++;
+                    membersLimit = args.indexOf('-r') != -1 ? membersLimit - 1 : membersLimit + 1;
+                    shownMembers++;
                     if (phoneMode == true) {
                         embedMembersList += `**${badge}** **${message.guild.members.find('id', key).user.username}** : **${value}** ${unity}\n`;
                     } else {
