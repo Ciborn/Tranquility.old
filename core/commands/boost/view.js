@@ -38,7 +38,6 @@ module.exports = async function(bot, message, args) {
     const embed = new Discord.RichEmbed()
         .setAuthor(message.author.username, message.author.avatarURL)
         .addField(`Current Boosts`, currentBoosts)
-        .addField('Available Boosts', 'None for now')
         .setColor('BLUE');
     message.channel.send({embed});
     
