@@ -9,7 +9,7 @@ module.exports = async function(bot, message, args) {
             .setTitle(`osu! Statistics for Standard mode`)
             .addField('Accuracy', `${Math.round(100 * data[0].accuracy)/100}%`, true)
             .addField('Play Count', numeral(data[0].playcount).format('0,0'), true)
-            .addField('Ranked Informations', `**Country Ranking** : #${numeral(data[0].pp_country_rank).format('0,0')}\n**Score** : ${numeral(data[0].ranked_score).format('0,0')}\n**PPs** : ${numeral(Math.round(10 * data[0].pp_raw)/10).format('0,0.0')}`, true)
+            .addField('Ranked Informations', `**Country Ranking** : #${numeral(data[0].pp_country_rank).format('0,0')}\n**Score** : ${numeral(data[0].ranked_score).format('0,0')}\n**PPs** : ${data[0].pp_raw}`, true)
             .addField('Count Ranks', `**SS+ / SS** : ${numeral(parseInt(data[0].count_rank_ssh)+parseInt(data[0].count_rank_ss)).format('0,0')}\n**S+ / S** : ${numeral(parseInt(data[0].count_rank_sh)+parseInt(data[0].count_rank_s)).format('0,0')}\n**A** : ${numeral(data[0].count_rank_a).format('0,0')}`, true)
             .setThumbnail(`https://a.ppy.sh/${data[0].user_id}`)
             .setColor(`#dc98a4`);
