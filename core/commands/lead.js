@@ -108,30 +108,32 @@ module.exports = async function(bot, message, args) {
 
         try {
             for (let [key, value] of allMembers) {
-                if (shownMembers < limit) {
-                    let badge = '';
-                    if (membersLimit == 0) {
-                        embedMembersList += `**Top 3**\n`;
-                        badge = `:first_place:`;
-                    } else if (membersLimit == 1) {
-                        badge = ':second_place:'
-                    } else if (membersLimit == 2) {
-                        badge = ':third_place:'
-                    } else if (membersLimit == 3) {
-                        embedMembersList += `\n**Top 10**\n`;
-                        badge = `\`\`${membersLimit+1}\`\`.`;
-                    } else if (membersLimit == 10) {
-                        embedMembersList += `\n`;
-                        badge = `\`\`${membersLimit+1}\`\`.`;
-                    } else {
-                        badge = `\`\`${membersLimit+1}\`\`.`;
-                    }
-                    membersLimit = args.indexOf('-r') != -1 ? membersLimit - 1 : membersLimit + 1;
-                    shownMembers++;
-                    if (phoneMode == true) {
-                        embedMembersList += `**${badge}** **${message.guild.members.find('id', key).user.username}** : **${value}** ${unity}\n`;
-                    } else {
-                        embedMembersList += `**${badge}** <@${key}> : **${value}** ${unity}\n`;
+                if (message.guild.members.find('id', key) != null) {
+                    if (shownMembers < limit) {
+                        let badge = '';
+                        if (membersLimit == 0) {
+                            embedMembersList += `**Top 3**\n`;
+                            badge = `:first_place:`;
+                        } else if (membersLimit == 1) {
+                            badge = ':second_place:'
+                        } else if (membersLimit == 2) {
+                            badge = ':third_place:'
+                        } else if (membersLimit == 3) {
+                            embedMembersList += `\n**Top 10**\n`;
+                            badge = `\`\`${membersLimit+1}\`\`.`;
+                        } else if (membersLimit == 10) {
+                            embedMembersList += `\n`;
+                            badge = `\`\`${membersLimit+1}\`\`.`;
+                        } else {
+                            badge = `\`\`${membersLimit+1}\`\`.`;
+                        }
+                        membersLimit = args.indexOf('-r') != -1 ? membersLimit - 1 : membersLimit + 1;
+                        shownMembers++;
+                        if (phoneMode == true) {
+                            embedMembersList += `**${badge}** **${message.guild.members.find('id', key).user.username}** : **${value}** ${unity}\n`;
+                        } else {
+                            embedMembersList += `**${badge}** <@${key}> : **${value}** ${unity}\n`;
+                        }
                     }
                 }
             }
